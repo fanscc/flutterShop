@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../service/service_method.dart';
@@ -18,6 +19,7 @@ class CategoryPage extends StatefulWidget {
 class _CategoryPageState extends State<CategoryPage> {
   List list = [];
   var listIndex = 0;
+  bool showOrhidden = false;
   void _getCategory() async {
     await request('getCategory').then((val) {
       var data = jsonDecode(val.toString());
@@ -40,6 +42,22 @@ class _CategoryPageState extends State<CategoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    Timer timer;
+    ScrollController _scrollController = new ScrollController();
+    _scrollController.addListener(() {
+      timer?.cancel();
+      timer = new Timer(Duration(seconds: 1), () {
+        if (_scrollController.position.pixels > 1000) {
+          setState(() {
+            showOrhidden = true;
+          });
+        } else {
+          setState(() {
+            showOrhidden = false;
+          });
+        }
+      });
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text('分类菜单'),
@@ -54,17 +72,21 @@ class _CategoryPageState extends State<CategoryPage> {
               children: <Widget>[
                 // Ckytest(),
                 RightCategoryNav(),
-                CategoryGoodsList()
+                CategoryGoodsList(scrollController: _scrollController)
               ],
             )
           ],
         ),
       )),
-      floatingActionButton: FloatingActionButton(
-        mini: true,
-        onPressed: () => print("FloatingActionButton"),
-        child: Icon(Icons.arrow_upward),
-      ),
+      floatingActionButton: showOrhidden
+          ? FloatingActionButton(
+              mini: true,
+              onPressed: () {
+                _scrollController.jumpTo(0.0);
+              },
+              child: Icon(Icons.arrow_upward),
+            )
+          : Text(''),
     );
   }
 }
@@ -179,7 +201,8 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
 // 右侧商品内容
 
 class CategoryGoodsList extends StatefulWidget {
-  CategoryGoodsList({Key key}) : super(key: key);
+  ScrollController scrollController;
+  CategoryGoodsList({Key key, this.scrollController}) : super(key: key);
 
   @override
   _CategoryGoodsListState createState() => _CategoryGoodsListState();
@@ -188,13 +211,13 @@ class CategoryGoodsList extends StatefulWidget {
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
   List list = [];
   EasyRefreshController _controller;
-  ScrollController _scrollController;
+  // ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _controller = EasyRefreshController();
-    _scrollController = ScrollController();
+    // _scrollController = ScrollController();
   }
 
   Widget _leftImg(imgSrc) {
@@ -279,7 +302,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
         print(data.page);
         if (data.page == 2) {
           // 列表位置，放到最上边
-          _scrollController.jumpTo(0.0);
+          widget.scrollController.jumpTo(0.0);
         }
       } catch (e) {
         print('进入页面第一次初始化：$e');
@@ -306,7 +329,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
                       textColor: Colors.blue,
                     ),
                     child: ListView.builder(
-                      controller: _scrollController,
+                      controller: widget.scrollController,
                       itemCount: data.childGoodList.length,
                       itemBuilder: (context, index) {
                         return _listWidget(data.childGoodList[index]);

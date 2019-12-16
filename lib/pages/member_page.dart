@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../routers/application.dart';
 
 class MemberPage extends StatelessWidget {
   const MemberPage({Key key}) : super(key: key);
@@ -56,14 +57,20 @@ class Myorder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: ScreenUtil().setHeight(100),
-      decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(width: 1, color: Colors.black12))),
-      child: ListTile(
-        leading: Icon(Icons.list),
-        title: Text('我的订单'),
-        trailing: Icon(Icons.arrow_right),
+    return InkWell(
+      onTap: () {
+        Application.router.navigateTo(context, "/ckyDemo");
+      },
+      child: Container(
+        height: ScreenUtil().setHeight(100),
+        decoration: BoxDecoration(
+            border:
+                Border(bottom: BorderSide(width: 1, color: Colors.black12))),
+        child: ListTile(
+          leading: Icon(Icons.list),
+          title: Text('我的demo练习'),
+          trailing: Icon(Icons.arrow_right),
+        ),
       ),
     );
   }

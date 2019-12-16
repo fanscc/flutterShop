@@ -42,21 +42,23 @@ class _CategoryPageState extends State<CategoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    Timer timer;
+    // Timer timer;
     ScrollController _scrollController = new ScrollController();
     _scrollController.addListener(() {
-      timer?.cancel();
-      timer = new Timer(Duration(seconds: 1), () {
-        if (_scrollController.position.pixels > 1000) {
-          setState(() {
-            showOrhidden = true;
-          });
-        } else {
-          setState(() {
-            showOrhidden = false;
-          });
-        }
-      });
+      //  timer?.cancel();
+      //  timer = new Timer(Duration(milliseconds: 1), () {
+      if (_scrollController.position.pixels > 1000) {
+        if (showOrhidden) return;
+        setState(() {
+          showOrhidden = true;
+        });
+      } else {
+        if (!showOrhidden) return;
+        setState(() {
+          showOrhidden = false;
+        });
+      }
+      // });
     });
     return Scaffold(
       appBar: AppBar(
